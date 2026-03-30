@@ -142,6 +142,21 @@ nav {
 
 /* Stat tiles */
 .ip-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0; }
+.oapp-stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; margin: 8px 0; }
+.oapp-stat-tile {
+  padding: 6px 4px; border-radius: 5px;
+  border: 1px solid rgba(0,229,255,0.18); background: rgba(0,229,255,0.04);
+  text-align: center;
+}
+.oapp-stat-val {
+  font-family: var(--pgm-mono); font-size: 0.78rem; font-weight: 700;
+  color: #00e5ff; line-height: 1; display: block;
+}
+.oapp-stat-lbl {
+  font-family: var(--pgm-mono); font-size: 0.42rem; color: var(--pgm-muted);
+  margin-top: 3px; text-transform: uppercase; letter-spacing: 0.06em; display: block;
+}
+.oapp-stat-loading { opacity: 0.4; animation: blink 1.5s ease-in-out infinite; }
 .ip-stat-tile {
   padding: 7px 8px; border-radius: 6px;
   border: 1px solid var(--pgm-border); background: rgba(0,0,0,0.25);
@@ -500,6 +515,8 @@ nav {
 .tally-chip.t-concept .tv  { color: var(--pgm-purple); }
 .tally-chip.t-canon    { border-color: rgba(255,107,158,0.25); }
 .tally-chip.t-canon .tv    { color: var(--pgm-pink); }
+.tally-chip.t-oapp     { border-color: rgba(0,229,255,0.35); }
+.tally-chip.t-oapp .tv { color: #00e5ff; }
 .tally-chip.t-holonized { border-color: rgba(232,181,101,0.40); }
 .tally-chip.t-holonized .tv { color: var(--pgm-amber2); font-weight: 700; }
 .tally-sep { width: 1px; height: 16px; background: var(--pgm-border); flex-shrink: 0; }
@@ -546,6 +563,7 @@ nav {
 .status-dot.concept  { background: var(--pgm-purple); }
 .status-dot.partner  { background: var(--pgm-teal); }
 .status-dot.anchor   { background: var(--pgm-amber2); box-shadow: 0 0 4px rgba(232,181,101,0.5); }
+.status-dot.oapp     { background: #00e5ff; box-shadow: 0 0 5px rgba(0,229,255,0.6); animation: blink 2.5s ease-in-out infinite; }
 .status-dot.moon     { background: #b0b8cc; }
 .status-dot.planet   { background: #60c8ff; }
 .status-dot.star,.status-dot.superstar,.status-dot.grandstar,.status-dot.grandsuperstar { background: #ffd050; box-shadow: 0 0 6px rgba(255,208,80,0.6); animation: blink 3s ease-in-out infinite; }
@@ -704,11 +722,11 @@ details.fp-section[open] > summary { color: var(--pgm-amber); }
 <!-- Tally strip -->
 <div id="tally-strip">
   <span class="tally-label">Live tally</span>
-  <div class="tally-chip t-anchor" onclick="filterSystems('anchor')" title="Origin systems">
-    <span class="tv" id="tv-anchor">—</span><span class="tl">origin</span>
-  </div>
   <div class="tally-chip t-live" onclick="filterSystems('live')" title="Live systems">
     <span class="tv" id="tv-live">—</span><span class="tl">live</span>
+  </div>
+  <div class="tally-chip t-oapp" onclick="filterSystems('oapp')" title="Holonic OAPPs">
+    <span class="tv" id="tv-oapp">—</span><span class="tl">OAPPs</span>
   </div>
   <div class="tally-chip t-building" onclick="filterSystems('building')" title="Building">
     <span class="tv" id="tv-building">—</span><span class="tl">building</span>
@@ -718,9 +736,6 @@ details.fp-section[open] > summary { color: var(--pgm-amber); }
   </div>
   <div class="tally-chip t-concept" onclick="filterSystems('concept')" title="Concepts">
     <span class="tv" id="tv-concept">—</span><span class="tl">concepts</span>
-  </div>
-  <div class="tally-chip t-canon" onclick="filterSystems('fictional')" title="Canon">
-    <span class="tv" id="tv-fictional">—</span><span class="tl">canon</span>
   </div>
   <div class="tally-sep"></div>
   <div class="tally-chip t-holonized" onclick="filterSystems('holonized')" title="Holonized projects">
@@ -770,13 +785,13 @@ details.fp-section[open] > summary { color: var(--pgm-amber); }
         <div class="fp-dot" style="background:#ffffff;opacity:0.4"></div>
         <span>All</span><span class="fp-count" id="fc-all">—</span>
       </div>
-      <div class="fp-item" data-type="anchor" onclick="filterSystems('anchor')" id="fp-anchor">
-        <div class="fp-dot" style="background:#5ab4ff"></div>
-        <span>Origin</span><span class="fp-count" id="fc-anchor">—</span>
-      </div>
       <div class="fp-item" data-type="live" onclick="filterSystems('live')" id="fp-live">
         <div class="fp-dot" style="background:#00ee88"></div>
         <span>Live</span><span class="fp-count" id="fc-live">—</span>
+      </div>
+      <div class="fp-item" data-type="oapp" onclick="filterSystems('oapp')" id="fp-oapp">
+        <div class="fp-dot" style="background:#00e5ff"></div>
+        <span>Holonic OAPPs</span><span class="fp-count" id="fc-oapp">—</span>
       </div>
       <div class="fp-item" data-type="building" onclick="filterSystems('building')" id="fp-building">
         <div class="fp-dot" style="background:#ffbb33"></div>
@@ -789,10 +804,6 @@ details.fp-section[open] > summary { color: var(--pgm-amber); }
       <div class="fp-item" data-type="concept" onclick="filterSystems('concept')" id="fp-concept">
         <div class="fp-dot" style="background:#cc88ff"></div>
         <span>Concepts</span><span class="fp-count" id="fc-concept">—</span>
-      </div>
-      <div class="fp-item" data-type="fictional" onclick="filterSystems('fictional')" id="fp-fictional">
-        <div class="fp-dot" style="background:#ff66bb"></div>
-        <span>Canon</span><span class="fp-count" id="fc-fictional">—</span>
       </div>
     </div>
   </details>
@@ -907,18 +918,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 // ── System Data ──────────────────────────────────────────────────────────────
 const SYSTEMS = [
 
-  // ── ANCHOR ────────────────────────────────────────────────────────────────
-  { name:'Earth / Sol', shortName:'Sol', type:'anchor',
-    pos:[0,0,0],
-    subtitle:'The Fabulous Machine · Origin',
-    region:'Western Spiral Arm', sector:'ZZ9 Plural Z Alpha',
-    cat:'Origin / Anchor',
-    desc:'"Earth lives here in the unfashionable end of the Galaxy; supercomputer world demolished by Vogons." From here, the New Earth Operating System is being co-created — holofractal, sovereign at all levels, and fabulously playful.',
-    link: null },
-
   // ── LIVE TOOLS ────────────────────────────────────────────────────────────
   { name:'Heart of Gold', shortName:'HoG', type:'live',
-    pos:[6.2, 0.3, 3.1],
+    pos:[10.9, 0.4, 5.1],
     subtitle:'Builder Onboarding · LIVE',
     region:'Inner Arm', sector:'Improbability Drive Sector',
     cat:'Live Tool',
@@ -926,7 +928,7 @@ const SYSTEMS = [
     link:'https://heart-of-gold.vercel.app' },
 
   { name:'OASIS', shortName:'OASIS', type:'live',
-    pos:[5.5, -0.2, -6.4],
+    pos:[-5.5, -0.2, 11.8],
     subtitle:'Holonic Identity Layer · LIVE',
     region:'Inner Arm', sector:'Open Source Sector',
     cat:'Live Tool',
@@ -934,7 +936,7 @@ const SYSTEMS = [
     link:'https://api.oasisweb4.one' },
 
   { name:'Marvin', shortName:'Marvin', type:'live',
-    pos:[8.4, 1.1, 9.7],
+    pos:[-10.3, 0.9, -3.8],
     subtitle:'AI Guide Agent · LIVE',
     region:'Inner Arm', sector:'Sirius Cybernetics Sector',
     cat:'Character Agent',
@@ -942,7 +944,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Zaphod', shortName:'Zaphod', type:'live',
-    pos:[9.8, -0.8, 7.4],
+    pos:[7.7, -0.7, -9.2],
     subtitle:'AI Hype Agent · LIVE',
     region:'Inner Arm', sector:'Betelgeuse Sector',
     cat:'Character Agent',
@@ -950,24 +952,30 @@ const SYSTEMS = [
     link: null },
 
   // ── IN BUILD ──────────────────────────────────────────────────────────────
-  { name:'Pan Galactic Monitor', shortName:'PG Monitor', type:'building',
-    pos:[11.5, 0.8, 5.2],
-    subtitle:'Global Intelligence Globe · In Build',
+  { name:'Pan Galactic Monitor', shortName:'PG Monitor', type:'oapp',
+    pos:[21.2, 0.8, 5.7],
+    subtitle:'Builder Intelligence Globe · Holonic OAPP · STAR Registered',
     region:'Mid Arm', sector:'Deep Field Sector',
-    cat:'Platform',
-    desc:'Running locally with real data. Live map of sites, pledges, guides, builders, and hackathons across 10 confirmed sites. One sprint from public deploy. The nervous system dashboard for the whole Save the Planet program.',
+    cat:'Platform / Holonic OAPP',
+    desc:'Global 3D intelligence dashboard for the Fabulous Machine. Maps sites, builders, pledges, time exchanges, guides, hackathons, and equity deals across the network. Each pin is an OASIS Holon; builders link to OASIS Avatars; exchanges and pledges sync karma to the OASIS reputation layer. Providers: MongoDB, IPFS, Holochain.',
+    oappId: 'b0bf0be6-4462-46da-a910-03d0081b48b3',
+    oappType: 'OAPPTemplate',
+    oappFeatures: 'Avatar Auth,Karma Sync,AvatarDetail Skills,Holon Storage,Multi-Provider,STAR Registered',
     link: null },
 
-  { name:'Pan Galactic Timebank', shortName:'PG Timebank', type:'building',
-    pos:[9.8, -1.2, -9.1],
-    subtitle:'TEA Currency · In Build',
+  { name:'Pan Galactic Timebank', shortName:'PG Timebank', type:'oapp',
+    pos:[13.9, -0.9, -8.0],
+    subtitle:'TEA Currency · Holonic OAPP · STAR Registered',
     region:'Mid Arm', sector:'Time Vortex Sector',
-    cat:'Infrastructure',
-    desc:'Tracks Time, Energy, and Attention (TEA) — the core currency of the Fabulous Machine. Circles, pledges, hour exchanges, $SAFE token hooks, dynamic equity (Slicing the Pie). Architecture complete; Phase 1 wiring in progress. 42 hours per 6-week quest cycle.',
-    link: null },
+    cat:'Infrastructure / Holonic OAPP',
+    desc:'Tracks Time, Energy, and Attention (TEA) — the core currency of the Fabulous Machine. Registered as a STAR OAPP Template with full holonic integration: OASIS Avatar authentication, karma sync at clearing, skills and offers mirrored to OASIS AvatarDetail, per-circle provider selection across MongoDB, Solana, IPFS, and Holochain. Circles, pledges, hour exchanges, $SAFE token hooks, dynamic equity (Slicing the Pie). 42 hours per 6-week quest cycle.',
+    oappId: '06ee81c2-4feb-471c-a726-5f37cf1d8134',
+    oappType: 'OAPPTemplate',
+    oappFeatures: 'Avatar Auth,Karma Sync,AvatarDetail Skills,Provider Selection,STAR Holons,C# OAPP',
+    link: 'https://pgt.oasisweb4.one' },
 
   { name:'Anarchive', shortName:'Anarchive', type:'building',
-    pos:[13.8, 0.3, -5.7],
+    pos:[18.4, 0.3, -18.4],
     subtitle:'Federated Knowledge Store · In Build',
     region:'Mid Arm', sector:'Library of Babel Sector',
     cat:'Infrastructure',
@@ -975,7 +983,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Trillian', shortName:'Trillian', type:'building',
-    pos:[-9.4, 0.5, 8.2],
+    pos:[-19.6, 1.0, -13.8],
     subtitle:'AI Research Agent · Planned',
     region:'Mid Arm', sector:'Magrathea Approach',
     cat:'Character Agent',
@@ -983,7 +991,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'IDA', shortName:'IDA', type:'building',
-    pos:[-11.2, 1.0, 6.1],
+    pos:[3.8, -0.8, -21.7],
     subtitle:'Interdimensional Dollar · Planned',
     region:'Mid Arm', sector:'Currency Exchange Sector',
     cat:'Token / Currency',
@@ -992,7 +1000,7 @@ const SYSTEMS = [
 
   // ── CONCEPTS ──────────────────────────────────────────────────────────────
   { name:'Circles', shortName:'Circles', type:'concept',
-    pos:[3.2, -0.1, 5.8],
+    pos:[9.6, 0.2, 11.5],
     subtitle:'Holonic Groups · Core Concept',
     region:'Inner Arm', sector:'Assembly Sector',
     cat:'Fabulous Machine',
@@ -1000,7 +1008,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Quests', shortName:'Quests', type:'concept',
-    pos:[6.0, -0.3, -3.2],
+    pos:[9.8, -0.3, -13.9],
     subtitle:'42-Day Cycles · Core Concept',
     region:'Inner Arm', sector:'Temporal Mechanics Sector',
     cat:'Fabulous Machine',
@@ -1008,7 +1016,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Babel Fish', shortName:'Babel Fish', type:'concept',
-    pos:[7.3, 0.4, 4.8],
+    pos:[-12.7, 0.6, 5.9],
     subtitle:'Universal Translation · Core Concept',
     region:'Mid Arm', sector:'Linguistics Sector',
     cat:'Fabulous Machine',
@@ -1016,7 +1024,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Pangalactic Lottery', shortName:'PG Lottery', type:'concept',
-    pos:[-19.4, 1.5, -5.3],
+    pos:[-12.9, 1.1, -15.3],
     subtitle:'Go-to-Market · Concept',
     region:'Outer Arm', sector:'Revenue Sector',
     cat:'Fabulous Machine',
@@ -1025,7 +1033,7 @@ const SYSTEMS = [
 
   // ── PARTNERS ──────────────────────────────────────────────────────────────
   { name:'OpenSERV', shortName:'OpenSERV', type:'partner',
-    pos:[-17.8, 0.7, 12.4],
+    pos:[-36.3, 0.9, -16.9],
     subtitle:'Agent Infrastructure · Partner',
     region:'Mid Arm', sector:'Builders Fund Sector',
     cat:'Partner',
@@ -1033,7 +1041,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'OpenImpact', shortName:'OpenImpact', type:'partner',
-    pos:[18.3, 0.5, 11.7],
+    pos:[25.2, 0.6, 36.0],
     subtitle:'Impact Marketplace · Partner',
     region:'Mid Arm', sector:'Impact Cluster',
     cat:'Partner',
@@ -1041,7 +1049,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Voiceback', shortName:'Voiceback', type:'partner',
-    pos:[-12.4, -0.4, -16.2],
+    pos:[-20.6, -0.5, -29.5],
     subtitle:'Community Voice Platform · Partner',
     region:'Mid Arm', sector:'Communications Sector',
     cat:'Partner',
@@ -1049,7 +1057,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Pangea', shortName:'Pangea', type:'partner',
-    pos:[19.6, -0.9, -14.7],
+    pos:[20.0, -0.9, -34.6],
     subtitle:'Holofractal Data Architecture · Partner',
     region:'Mid Arm', sector:'Impact Cluster',
     cat:'Partner',
@@ -1057,7 +1065,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'BRAID', shortName:'BRAID', type:'partner',
-    pos:[10.9, 1.3, -12.6],
+    pos:[10.9, 1.3, -40.6],
     subtitle:'Privacy-Preserving Identity · Partner',
     region:'Mid Arm', sector:'Privacy Layer Sector',
     cat:'Partner',
@@ -1065,7 +1073,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'LIONSBERG', shortName:'LIONSBERG', type:'partner',
-    pos:[14.7, 0.1, -10.3],
+    pos:[-18.6, 0.2, -39.9],
     subtitle:'Fair Shares Commons · Partner',
     region:'Mid Arm', sector:'Governance Sector',
     cat:'Partner',
@@ -1073,7 +1081,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Lexon', shortName:'Lexon', type:'partner',
-    pos:[-14.6, 0.3, -17.9],
+    pos:[-47.3, 0.7, -8.3],
     subtitle:'Human-Legible Smart Contracts · Partner',
     region:'Outer Arm', sector:'Legal Layer Sector',
     cat:'Partner',
@@ -1081,7 +1089,7 @@ const SYSTEMS = [
     link: null },
 
   { name:'Gatherverse', shortName:'Gatherverse', type:'partner',
-    pos:[21.8, 1.2, 8.6],
+    pos:[10.4, 0.8, 38.6],
     subtitle:'XR / VR Festival · Partner',
     region:'Outer Arm', sector:'Extended Reality Sector',
     cat:'Partner',
@@ -1089,60 +1097,11 @@ const SYSTEMS = [
     link: null },
 
   { name:'United Earth Networks', shortName:'UEN', type:'partner',
-    pos:[-16.3, -0.6, 9.8],
+    pos:[-37.6, -0.7, 13.7],
     subtitle:'Earth Governance Network · Partner',
     region:'Mid Arm', sector:'Federation Sector',
     cat:'Partner',
     desc:'Global coordination network. One of the federating partner organisations in the Omni-Federation structure. Connecting bioregional governance, indigenous sovereignty frameworks, and planetary systems thinking to the Fabulous Machine\'s holofractal architecture.',
-    link: null },
-
-  // ── FICTIONAL (Douglas Adams canon easter eggs) ────────────────────────────
-  { name:'Magrathea', shortName:'Magrathea', type:'fictional',
-    pos:[-32.5, 2.1, -14.8],
-    subtitle:'Custom Planet Workshop · Canonical',
-    region:'Outer Rim', sector:"Qua'do Sector",
-    cat:'Douglas Adams Canon',
-    desc:'"Slartibartfast won an award for the Norwegian fjords." Ancient world whose hyper-intelligent inhabitants built custom planets to order for the obscenely rich. Currently dormant pending demand recovery. The original holonic design studio — every planet a bespoke creation, sovereign and whole.',
-    link: null },
-
-  { name:'Betelgeuse System', shortName:'Betelgeuse', type:'fictional',
-    pos:[36.4, -2.8, 11.2],
-    subtitle:"Ford Prefect's Home · Canonical",
-    region:'Orion Arm', sector:'Betelgeuse Sector',
-    cat:'Douglas Adams Canon',
-    desc:'"Ford Prefect had incorrectly assumed Earth was uninhabited." Red supergiant nearing the end of its life. Home system of Ford Prefect, researcher for the Hitchhiker\'s Guide to the Galaxy, stranded on Earth for 15 years after miscalculating when the Vogons would arrive.',
-    link: null },
-
-  { name:'Frogstar World B', shortName:'Frogstar B', type:'fictional',
-    pos:[27.6, 1.3, -22.4],
-    subtitle:'Total Perspective Vortex · Canonical',
-    region:'Frogstar Cluster', sector:'Frogstar Sector',
-    cat:'Douglas Adams Canon',
-    desc:'Home of the Total Perspective Vortex — the only known instrument capable of showing you your exact size relative to the entire universe. "Into one end is fed the whole of the universe. From the other end comes a tiny little spike, with a notice on it saying YOU ARE HERE." The antithesis of the Fabulous Machine.',
-    link: null },
-
-  { name:'Vogsphere', shortName:'Vogsphere', type:'fictional',
-    pos:[-31.7, 0.8, 20.3],
-    subtitle:"Vogon Homeworld · Canonical",
-    region:'Vogon Space', sector:'Outer Reaches',
-    cat:'Douglas Adams Canon',
-    desc:'"They are one of the most unpleasant races in the Galaxy — not actually evil, but bad-tempered, bureaucratic, officious, and callous." Vogsphere is a warning: the old machine that the Fabulous Machine must replace. Demolition notices posted without consultation since the dawn of recorded history.',
-    link: null },
-
-  { name:'Milliways', shortName:'Milliways', type:'fictional',
-    pos:[40.2, 2.3, -5.1],
-    subtitle:'Restaurant at the End of the Universe · Canonical',
-    region:'Temporal Anomaly Zone', sector:'End of Time',
-    cat:'Douglas Adams Canon',
-    desc:'"The Restaurant at the End of the Universe is one of the most extraordinary ventures in the entire history of catering." Located at the literal end of the universe — great place to watch the final destruction of everything while eating excellent food. Hypothetical venue for the Annual Galactic Meeting of the Fabulous Machine.',
-    link: null },
-
-  { name:'Krikkit', shortName:'Krikkit', type:'fictional',
-    pos:[-37.9, -2.2, 15.6],
-    subtitle:'Most Isolated World · Canonical',
-    region:'Dust Cloud', sector:'Krikkit Sector',
-    cat:'Douglas Adams Canon',
-    desc:'"The most mind-bogglingly dull planet that ever existed." Enclosed in a Slo-Time envelope for two million years for attempting to destroy the universe after discovering it. A lesson in what happens when a civilisation builds walls instead of bridges — the opposite of the Open, Federated, Fabulous Machine.',
     link: null },
 
 ];
@@ -1151,6 +1110,7 @@ const SYSTEMS = [
 const TYPE_CFG = {
   anchor:       { color: 0xc4906a, glow: 0.60, size: 0.70 },  // amber — Sol
   live:         { color: 0x00cc77, glow: 0.50, size: 0.44 },
+  oapp:         { color: 0x00e5ff, glow: 0.48, size: 0.42 },  // live holonic OAPP
   building:     { color: 0xffbb33, glow: 0.38, size: 0.36 },
   partner:      { color: 0x6ecfb8, glow: 0.35, size: 0.34 },
   concept:      { color: 0xcc88ff, glow: 0.32, size: 0.30 },
@@ -1216,12 +1176,10 @@ const initTarget = controls.target.clone();
   scene.add(new THREE.Points(geo, new THREE.PointsMaterial({ size:0.11, color:0xffffff, transparent:true, opacity:0.25 })));
 })();
 
-// Galactic core glow
-const core = new THREE.Sprite(new THREE.SpriteMaterial({ color:0xffeecc, transparent:true, opacity:0.15, depthWrite:false }));
-core.scale.setScalar(30); scene.add(core);
 
 // ── System markers ───────────────────────────────────────────────────────────
-const systemMeshes = [];
+const systemMeshes = [];   // invisible hit spheres (raycasted)
+const visualMeshes = [];   // visible colored spheres (rendered)
 const labelDivs    = [];
 
 SYSTEMS.forEach((s, idx) => {
@@ -1234,12 +1192,21 @@ SYSTEMS.forEach((s, idx) => {
   glow.position.copy(p);
   scene.add(glow);
 
-  const mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(Math.max(cfg.size * 0.52, 0.32), 12, 12),
+  // Visual sphere — size as designed, not used for raycasting
+  const visualR = Math.max(cfg.size * 0.52, 0.32);
+  const visual  = new THREE.Mesh(
+    new THREE.SphereGeometry(visualR, 12, 12),
     new THREE.MeshBasicMaterial({ color: cfg.color })
   );
+  visual.position.copy(p);
+  scene.add(visual);
+  visualMeshes.push(visual);
+
+  // Proxy mesh — zero-size, just carries userData for screen-space hit detection
+  const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
   mesh.position.copy(p);
-  mesh.userData = { ...s, idx, glow, glowMat };
+  mesh.visible = true;
+  mesh.userData = { ...s, idx, glow, glowMat, visualMesh: visual };
   scene.add(mesh);
   systemMeshes.push(mesh);
 
@@ -1265,10 +1232,9 @@ function cssColor(hex, a=1) {
 // ── Routes ───────────────────────────────────────────────────────────────────
 const routeLines = [];
 const ROUTES = [
-  [0,1],[0,2],[0,3],[0,4],[0,10],[0,11],[0,12],
-  [1,2],[1,5],[2,5],[3,4],
-  [5,6],[6,7],[2,13],[2,14],
-  [13,16],[14,16],[16,17],
+  [0,1],[0,4],[1,4],[2,3],
+  [1,5],[4,5],[5,6],[5,9],[1,12],[1,13],
+  [12,15],[13,15],[15,16],
 ];
 ROUTES.forEach(([a,b]) => {
   const pa = new THREE.Vector3(...SYSTEMS[a].pos);
@@ -1300,6 +1266,7 @@ window.filterSystems = type => {
     const show = type === 'all' || mesh.userData.type === type;
     mesh.visible = show;
     mesh.userData.glow.visible = show;
+    if (mesh.userData.visualMesh) mesh.userData.visualMesh.visible = show;
   });
   labelDivs.forEach(({div, mesh}) => {
     if (!mesh.visible) div.style.opacity = '0';
@@ -1311,27 +1278,37 @@ const typeCounts = {};
 SYSTEMS.forEach(s => { typeCounts[s.type] = (typeCounts[s.type]||0)+1; });
 document.getElementById('fc-all').textContent = SYSTEMS.length;
 Object.entries(typeCounts).forEach(([t,n]) => {
-  const el = document.getElementById('fc-'+t);
-  if (el) el.textContent = n;
+  const fc = document.getElementById('fc-'+t); if (fc) fc.textContent = n;
+  const tv = document.getElementById('tv-'+t); if (tv) tv.textContent = n;
 });
 
-// ── Raycaster ────────────────────────────────────────────────────────────────
-const raycaster = new THREE.Raycaster();
-raycaster.params.Line   = { threshold: 0.5 };
-raycaster.params.Points = { threshold: 0.5 };
-const mouse     = new THREE.Vector2();
-const tooltip   = document.getElementById('tooltip');
+// ── Screen-space hit detection ───────────────────────────────────────────────
+// Projects every system to 2D and finds the nearest one within a pixel
+// threshold — reliable at any zoom level, far better than 3D raycasting.
+const tooltip = document.getElementById('tooltip');
+const _ssVec  = new THREE.Vector3();
+
+function nearestVisibleSystem(clientX, clientY, thresholdPx) {
+  let best = null, bestDist = thresholdPx;
+  systemMeshes.forEach(mesh => {
+    if (!mesh.visible) return;
+    _ssVec.copy(mesh.position).project(camera);
+    if (_ssVec.z > 1) return; // behind camera
+    const sx = (_ssVec.x *  0.5 + 0.5) * window.innerWidth;
+    const sy = (_ssVec.y * -0.5 + 0.5) * window.innerHeight;
+    const d  = Math.hypot(sx - clientX, sy - clientY);
+    if (d < bestDist) { bestDist = d; best = mesh; }
+  });
+  return best;
+}
 
 renderer.domElement.addEventListener('pointermove', e => {
-  mouse.x = (e.clientX/window.innerWidth)*2-1;
-  mouse.y = (e.clientY/window.innerHeight)*-2+1;
-  raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(systemMeshes.filter(m=>m.visible));
-  if (hits.length) {
+  const hit = nearestVisibleSystem(e.clientX, e.clientY, 52);
+  if (hit) {
     tooltip.style.display = 'block';
-    tooltip.style.left    = (e.clientX+14)+'px';
-    tooltip.style.top     = (e.clientY-10)+'px';
-    tooltip.textContent   = hits[0].object.userData.name;
+    tooltip.style.left    = (e.clientX + 14) + 'px';
+    tooltip.style.top     = (e.clientY - 10) + 'px';
+    tooltip.textContent   = hit.userData.name;
     renderer.domElement.style.cursor = 'pointer';
   } else {
     tooltip.style.display = 'none';
@@ -1340,14 +1317,9 @@ renderer.domElement.addEventListener('pointermove', e => {
 });
 
 renderer.domElement.addEventListener('click', e => {
-  mouse.x = (e.clientX/window.innerWidth)*2-1;
-  mouse.y = (e.clientY/window.innerHeight)*-2+1;
-  raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(systemMeshes.filter(m=>m.visible));
-  if (hits.length) {
-    const mesh = hits[0].object;
-    selectSystem(mesh);
-    flyTo(mesh.position);
+  const hit = nearestVisibleSystem(e.clientX, e.clientY, 60);
+  if (hit) {
+    selectSystem(hit);
     window._mobAutoOpenInfo?.();
   }
 });
@@ -1362,6 +1334,7 @@ function esc(x) {
 const TYPE_ACCENT = {
   anchor:         'var(--pgm-amber2)',
   live:           'var(--pgm-green)',
+  oapp:           '#00e5ff',
   building:       '#ffbb33',
   partner:        'var(--pgm-teal)',
   concept:        'var(--pgm-purple)',
@@ -1377,6 +1350,7 @@ const TYPE_ACCENT = {
 const TYPE_LABEL = {
   anchor:         'Origin Anchor',
   live:           'Live · Deployed',
+  oapp:           'Holonic OAPP',
   building:       'In Build',
   partner:        'Partner',
   concept:        'Core Concept',
@@ -1415,6 +1389,11 @@ function selectSystem(mesh) {
   ringMat.color.setHex(cfg.color);
   ringMat.opacity = 0.6;
   ringMesh.lookAt(camera.position);
+  // Scale ring to hug the visual sphere, not the invisible hit sphere
+  const visualR = mesh.userData.visualMesh
+    ? mesh.userData.visualMesh.geometry.parameters.radius
+    : Math.max(cfg.size * 0.52, 0.32);
+  ringMesh.scale.setScalar(visualR / 0.95);
   ringGeo.computeBoundingSphere();
 
   // Store for modal
@@ -1425,7 +1404,7 @@ function selectSystem(mesh) {
 
   // ── Badge row ────────────────────────────────────────────────────────────
   const statusBadgeColor = {
-    live: 'rgba(110,207,184,0.15)', building: 'rgba(232,181,101,0.15)',
+    live: 'rgba(110,207,184,0.15)', oapp: 'rgba(0,229,255,0.12)', building: 'rgba(232,181,101,0.15)',
     anchor: 'rgba(90,180,255,0.15)', partner: 'rgba(0,221,204,0.12)',
     concept: 'rgba(179,136,255,0.12)', fictional: 'rgba(255,107,158,0.12)',
     moon: 'rgba(176,184,204,0.12)', planet: 'rgba(96,200,255,0.12)',
@@ -1534,6 +1513,29 @@ function selectSystem(mesh) {
     ? `<a class="ip-ext-link" href="${esc(linkUrl)}" target="_blank">↗ ${esc(linkUrl.replace('https://',''))}</a>`
     : '';
 
+  // ── OASIS OAPP integration section ────────────────────────────────────────
+  let oappHtml = '';
+  if (s.type === 'oapp') {
+    const featChips = (s.oappFeatures || '')
+      .split(',').map(f => `<span class="lang-chip">${esc(f.trim())}</span>`).join('');
+    oappHtml = `
+      <div class="ip-divider"></div>
+      <div class="ip-meta-row">
+        <span class="ip-meta-key" style="color:#00e5ff;opacity:0.9">⬡ OASIS</span>
+        <span class="ip-meta-val" style="color:#00e5ff;font-weight:600">STAR Registered OAPP</span>
+      </div>
+      ${s.oappType ? `<div class="ip-meta-row"><span class="ip-meta-key">Type</span><span class="ip-meta-val" style="color:#00e5ff">${esc(s.oappType)}</span></div>` : ''}
+      <div class="oapp-stat-grid" id="oapp-stats-ip">
+        <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="avatars">—</span><span class="oapp-stat-lbl">Avatars</span></div>
+        <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="karma">—</span><span class="oapp-stat-lbl">Karma</span></div>
+        <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="circles">—</span><span class="oapp-stat-lbl">Circles</span></div>
+        <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="tea">—</span><span class="oapp-stat-lbl">TEA hrs</span></div>
+      </div>
+      ${s.oappId ? `<div class="ip-meta-row"><span class="ip-meta-key">OAPP ID</span><span class="ip-meta-val" style="font-size:0.5rem;word-break:break-all;opacity:0.7">${esc(s.oappId)}</span></div>` : ''}
+      ${featChips ? `<div class="lang-chip-row" style="margin-top:6px">${featChips}</div>` : ''}
+    `;
+  }
+
   // ── Compose ───────────────────────────────────────────────────────────────
   const cbVisual = s.holonized ? buildCbVisual(s.type) : '';
   const ipEl = document.getElementById('ip-content');
@@ -1547,10 +1549,16 @@ function selectSystem(mesh) {
     <div class="ip-meta-row"><span class="ip-meta-key">Region</span><span class="ip-meta-val">${esc(s.region||'—')}</span></div>
     <div class="ip-meta-row"><span class="ip-meta-key">Sector</span><span class="ip-meta-val">${esc(s.sector||'—')}</span></div>
     <div class="ip-meta-row"><span class="ip-meta-key">Category</span><span class="ip-meta-val">${esc(s.cat||'—')}</span></div>
+    ${oappHtml}
     ${holonizedHtml}
     ${linkHtml}
     <button class="ip-full-btn" onclick="openSystemModal(window._selectedSystem)">Full details →</button>
   `;
+
+  // Populate OAPP live stats asynchronously
+  if (s.type === 'oapp' && s.oappId) {
+    fetchOappStats(s.oappId).then(data => applyOappStats('oapp-stats-ip', data));
+  }
 }
 
 // ── openSystemModal ───────────────────────────────────────────────────────────
@@ -1584,6 +1592,31 @@ window.openSystemModal = function(s) {
       <div class="modal-nest-body" style="padding:8px 12px 10px">${navRows}</div>
     </details>
   `;
+
+  // ── OASIS OAPP integration (collapsible) ─────────────────────────────────
+  if (s.type === 'oapp') {
+    const modalFeatChips = (s.oappFeatures || '')
+      .split(',').map(f => `<span class="modal-lang-chip">${esc(f.trim())}</span>`).join('');
+    body += `
+      <details class="modal-nest" open>
+        <summary>OASIS Live Stats</summary>
+        <div class="modal-nest-body" style="padding:10px 12px 12px">
+          <div class="oapp-stat-grid" id="oapp-stats-modal" style="grid-template-columns:repeat(4,1fr);margin-bottom:10px">
+            <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="avatars" style="font-size:1.1rem">—</span><span class="oapp-stat-lbl">Avatars</span></div>
+            <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="karma"   style="font-size:1.1rem">—</span><span class="oapp-stat-lbl">Karma</span></div>
+            <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="circles" style="font-size:1.1rem">—</span><span class="oapp-stat-lbl">Circles</span></div>
+            <div class="oapp-stat-tile oapp-stat-loading"><span class="oapp-stat-val" data-stat="tea"     style="font-size:1.1rem">—</span><span class="oapp-stat-lbl">TEA hrs</span></div>
+          </div>
+          ${s.oappId ? `<div class="modal-meta-row"><span class="modal-meta-key">OAPP ID</span><span class="modal-meta-val" style="font-size:0.56rem;word-break:break-all">${esc(s.oappId)}</span></div>` : ''}
+          ${s.oappType ? `<div class="modal-meta-row"><span class="modal-meta-key">OAPP Type</span><span class="modal-meta-val" style="color:#00e5ff">${esc(s.oappType)}</span></div>` : ''}
+          ${modalFeatChips ? `<div style="margin-top:8px">${modalFeatChips}</div>` : ''}
+          <p style="font-family:var(--pgm-mono);font-size:0.62rem;line-height:1.6;color:var(--pgm-muted);margin-top:10px">
+            All member records stored as OASIS <strong style="color:var(--pgm-text)">IHolon</strong> objects replicated across the selected provider network. Members identified by OASIS Avatar. Time contributions tracked as karma across the full OASIS ecosystem.
+          </p>
+        </div>
+      </details>
+    `;
+  }
 
   // ── Holonized code stats (collapsible) ────────────────────────────────────
   if (s.holonized) {
@@ -1681,6 +1714,11 @@ window.openSystemModal = function(s) {
 
   document.getElementById('modal-body').innerHTML = body;
   document.getElementById('sysModal').classList.add('open');
+
+  // Populate OAPP live stats in modal asynchronously
+  if (s.type === 'oapp' && s.oappId) {
+    fetchOappStats(s.oappId).then(data => applyOappStats('oapp-stats-modal', data));
+  }
 };
 
 // ── Modal close ───────────────────────────────────────────────────────────────
@@ -1811,6 +1849,36 @@ setTimeout(() => {
 // Leave empty to use relative URLs (works when served by the .NET host directly)
 const OASIS_API = window.__OASIS_API__ || '';
 
+// ── OAPP live stats fetch ─────────────────────────────────────────────────────
+// Expected endpoint: GET /api/oapp/{oappId}/stats
+// Expected response: { avatarCount, karmaTotal, circleCount, transactionCount, lastActiveAt }
+const _oappStatsCache = {};
+async function fetchOappStats(oappId) {
+  if (_oappStatsCache[oappId]) return _oappStatsCache[oappId];
+  if (!OASIS_API) return null;
+  try {
+    const ctrl = new AbortController();
+    const tid   = setTimeout(() => ctrl.abort(), 6000);
+    const r = await fetch(`${OASIS_API}/api/oapp/${oappId}/stats`, { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    _oappStatsCache[oappId] = data;
+    return data;
+  } catch { return null; }
+}
+
+function applyOappStats(containerId, data) {
+  const el = document.getElementById(containerId);
+  if (!el || !el.isConnected || !data) return;
+  const fmt = n => n == null ? '—' : n >= 1000 ? (n/1000).toFixed(1)+'k' : String(n);
+  el.querySelectorAll('[data-stat]').forEach(span => {
+    const key = span.dataset.stat;
+    const map = { avatars: data.avatarCount, karma: data.karmaTotal, circles: data.circleCount, tea: data.transactionCount };
+    if (map[key] != null) { span.textContent = fmt(map[key]); span.closest('.oapp-stat-tile')?.classList.remove('oapp-stat-loading'); }
+  });
+}
+
 function addHolonizedSystem(entry) {
   const typeMap = { grandsuperstar:'grandsuperstar', grandstar:'grandstar', superstar:'superstar', star:'star', planet:'planet', moon:'moon' };
   const sysType = typeMap[entry.bodyType] || 'star';
@@ -1851,13 +1919,19 @@ function addHolonizedSystem(entry) {
   glow.position.copy(p);
   scene.add(glow);
 
-  // Holonized spheres — larger radius for both visual impact and click target
-  const mesh = new THREE.Mesh(
+  // Holonized spheres — visual sphere + invisible hit sphere
+  const holVisual = new THREE.Mesh(
     new THREE.SphereGeometry(Math.max(cfg.size * 0.72, 0.32), 12, 12),
     new THREE.MeshBasicMaterial({ color: cfg.color })
   );
+  holVisual.position.copy(p);
+  scene.add(holVisual);
+  visualMeshes.push(holVisual);
+
+  const mesh = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
   mesh.position.copy(p);
-  mesh.userData = { ...s, idx: systemMeshes.length, glow, glowMat };
+  mesh.visible = true;
+  mesh.userData = { ...s, idx: systemMeshes.length, glow, glowMat, visualMesh: holVisual };
   scene.add(mesh);
   systemMeshes.push(mesh);
 
@@ -2028,6 +2102,166 @@ function renderTicker() {
 setTimeout(() => { renderTally(); renderTicker(); }, 300);
 
 setTimeout(fetchHolonizedApps, 1500);
+
+// ── STARNET auto-discovery ────────────────────────────────────────────────────
+// Any OAPP registered in STARNET automatically appears as a celestial body.
+// No manual entry required. Two auth modes:
+//   1. Unauthenticated: tries /api/OAPPs/search (works for published public OAPPs)
+//   2. Authenticated: uses window.__OASIS_JWT__ if set, calls /api/OAPPs for all
+//
+// How to set your OASIS API and JWT in any host page:
+//   <script>
+//     window.__OASIS_API__ = 'http://localhost:5001';
+//     window.__OASIS_JWT__ = 'eyJhbGci...'; // optional: get from /api/Avatar/Authenticate
+//   </script>
+//
+// Position encoding:
+//   New OAPPs land in the "outer discovery arm" (radius 28–48) unless the OAPP
+//   author encodes a specific galaxy position in ourWorldLat / ourWorldLong when
+//   registering:
+//     ourWorldLat  (-90 → +90)   maps to  x  (-45 → +45)
+//     ourWorldLong (-180 → +180) maps to  z  (-45 → +45)
+//   If both are 0 (the default), position is derived deterministically from the UUID.
+
+// Collect static OAPP IDs so we never duplicate them
+const _staticOappIds = new Set(
+  SYSTEMS.filter(s => s.oappId).map(s => s.oappId)
+);
+
+function _positionFromUuid(uuid) {
+  // Derive a stable position in the outer discovery arm from the UUID hex string.
+  const hex = uuid.replace(/-/g, '');
+  const angle  = (parseInt(hex.slice(0,  8), 16) / 0xffffffff) * Math.PI * 2;
+  const radius = 28 + (parseInt(hex.slice(8, 16), 16) / 0xffffffff) * 20; // 28–48
+  const y      = ((parseInt(hex.slice(16, 24), 16) / 0xffffffff) - 0.5) * 8; // -4..+4
+  return [
+    Math.round(Math.cos(angle) * radius * 10) / 10,
+    Math.round(y * 10) / 10,
+    Math.round(Math.sin(angle) * radius * 10) / 10,
+  ];
+}
+
+function _oappTypeLabel(t) {
+  return { 0:'OAPP', 1:'Console OAPP', 2:'WebAPI OAPP', 3:'Blazor OAPP',
+           4:'MAUI OAPP', 5:'OAPP Template', 6:'Generated Code' }[t] || 'OAPP';
+}
+
+function _oappToSystem(oapp) {
+  const pos = (oapp.ourWorldLat || oapp.ourWorldLong)
+    ? [
+        Math.round(oapp.ourWorldLat  / 90  * 45 * 10) / 10,
+        0,
+        Math.round(oapp.ourWorldLong / 180 * 45 * 10) / 10,
+      ]
+    : _positionFromUuid(oapp.id);
+
+  const typeLabel = _oappTypeLabel(oapp.oAPPType);
+
+  return {
+    name:         oapp.name,
+    shortName:    oapp.name.length > 16 ? oapp.name.slice(0, 14) + '…' : oapp.name,
+    type:         'oapp',
+    pos,
+    subtitle:     `${typeLabel} · Holonic OAPP · STAR Registered`,
+    region:       'Outer Arm',
+    sector:       'STARNET Discovery Sector',
+    cat:          `${typeLabel} / Holonic OAPP`,
+    desc:         oapp.description || `${oapp.name} — registered on STARNET.`,
+    oappId:       oapp.id,
+    oappType:     typeLabel,
+    oappFeatures: 'STAR Registered,Holonic',
+    link:         oapp.link || null,
+    _fromStarnet: true,
+  };
+}
+
+async function fetchStarnetOapps() {
+  if (!OASIS_API) return;
+  const jwt = window.__OASIS_JWT__ || null;
+
+  // Try authenticated list first; fall back to public search
+  const endpoints = jwt
+    ? [`${OASIS_API}/api/OAPPs`, `${OASIS_API}/api/OAPPs/search?searchTerm=`]
+    : [`${OASIS_API}/api/OAPPs/search?searchTerm=`];
+
+  for (const url of endpoints) {
+    try {
+      const ctrl = new AbortController();
+      const tid  = setTimeout(() => ctrl.abort(), 8000);
+      const headers = { Accept: 'application/json' };
+      if (jwt) headers['Authorization'] = `Bearer ${jwt}`;
+
+      const r = await fetch(url, { signal: ctrl.signal, headers });
+      clearTimeout(tid);
+      if (!r.ok) continue;
+
+      const body = await r.json();
+      // Unwrap OASIS envelope: body.result or body.results or body (array)
+      const list = Array.isArray(body) ? body
+        : Array.isArray(body?.result)   ? body.result
+        : Array.isArray(body?.results)  ? body.results
+        : [];
+
+      if (!list.length) continue;
+
+      let added = 0;
+      for (const oapp of list) {
+        if (!oapp?.id || !oapp?.name) continue;
+        if (_staticOappIds.has(oapp.id)) continue;          // already in static list
+        if (systemMeshes.some(m => m.userData.oappId === oapp.id)) continue; // already rendered
+
+        const sys = _oappToSystem(oapp);
+        _addStarnetOapp(sys);
+        added++;
+      }
+
+      if (added > 0) { renderTally(); renderTicker(); }
+      return; // success — stop trying endpoints
+    } catch { continue; }
+  }
+}
+
+function _addStarnetOapp(s) {
+  if (systemMeshes.some(m => m.userData.name === s.name)) return;
+
+  const cfg = TYPE_CFG['oapp'];
+  if (!cfg) return;
+
+  const p = new THREE.Vector3(...s.pos);
+
+  const glowMat = new THREE.SpriteMaterial({ color: cfg.color, transparent:true, opacity: cfg.glow, depthWrite:false });
+  const glow    = new THREE.Sprite(glowMat);
+  glow.scale.setScalar(cfg.size * 7.5);
+  glow.position.copy(p);
+  scene.add(glow);
+
+  const geo = new THREE.SphereGeometry(cfg.size * 0.001, 8, 8);
+  const mat = new THREE.MeshBasicMaterial({ color: cfg.color });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(p);
+  scene.add(mesh);
+
+  const visualGeo = new THREE.SphereGeometry(cfg.size * 0.95, 16, 16);
+  const visualMat = new THREE.MeshBasicMaterial({ color: cfg.color });
+  const visualMesh = new THREE.Mesh(visualGeo, visualMat);
+  visualMesh.position.copy(p);
+  scene.add(visualMesh);
+
+  mesh.userData = { ...s, glow, visualMesh, _fromStarnet: true };
+
+  const div = document.createElement('div');
+  div.className = 'sys-label';
+  div.textContent = s.shortName || s.name;
+  div.dataset.type = 'oapp';
+  document.getElementById('labels-overlay').appendChild(div);
+
+  systemMeshes.push(mesh);
+  labelDivs.push({ div, mesh });
+  _staticOappIds.add(s.oappId);
+}
+
+// Fetch STARNET OAPPs 2 seconds after page load (after the static scene is built)
+setTimeout(fetchStarnetOapps, 2000);
 
 // ── Mobile panel toggles ──────────────────────────────────────────────────────
 window.toggleMobFilter = function() {
